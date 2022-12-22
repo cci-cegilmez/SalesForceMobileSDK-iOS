@@ -980,14 +980,14 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
 }
 
 - (void)setUserName:(NSString *)username {
-    if ([username isEqualToString: @""] == false) {
+    if (username != nil && [username isEqualToString: @""] == false) {
         [[NSUserDefaults standardUserDefaults] setValue:[username stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
 -(void)setUserNameAzure:(NSString *)username_azure {
-    if ([username_azure isEqualToString: @""] == false) {
+    if (username_azure != nil && [username_azure isEqualToString: @""] == false) {
         [[NSUserDefaults standardUserDefaults] setValue:[username_azure stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
         [[NSUserDefaults standardUserDefaults] setValue:@"true" forKey:@"AzureLogin"];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -995,14 +995,14 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
 }
 
 - (void)setPassword:(NSString *)password {
-    if ([password isEqualToString: @""] == false) {
+    if (password != nil && [password isEqualToString: @""] == false) {
         [[NSUserDefaults standardUserDefaults] setValue:[password stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Password"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
 - (void)setPasswordAzure:(NSString *)password_azurePass {
-    if ([password_azurePass isEqualToString: @""] == false) {
+    if (password_azurePass != nil && [password_azurePass isEqualToString: @""] == false) {
         [[NSUserDefaults standardUserDefaults] setValue:[password_azurePass stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Password"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
