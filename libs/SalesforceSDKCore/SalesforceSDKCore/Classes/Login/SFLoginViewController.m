@@ -43,16 +43,16 @@
 
 @end
 
-BOOL isPreseller = true;
+BOOL isPreseller = false;
 
 @implementation SFLoginViewController
 @synthesize oauthView = _oauthView;
 @synthesize authorizingMessageLabel = _authorizingMessageLabel;
-//@synthesize usernameTextField = _label;
-//@synthesize passwordTextField = _passwordTextField;
+@synthesize usernameTextField = _label;
+@synthesize passwordTextField = _passwordTextField;
 @synthesize progressView = _progressView;
 @synthesize centerView = _centerView;
-@synthesize msg,isLoginClick,t,languageButton,languageTableView,goButton, resetPasswordButton,cityTableView,salesCenterTableView,langList,cityList,centerList,orLabel;
+@synthesize msg,isLoginClick,t,languageButton,languageTableView,goButton, resetPasswordButton,cityTableView,salesCenterTableView,langList,cityList,centerList,orLabel,loginTypeSwitch,loginTypeLabel;
 @synthesize usernameLocal;
 @synthesize passwordLocal;
 @synthesize selectCityLocal;
@@ -138,35 +138,6 @@ BOOL isPreseller = true;
     if (_avPl != nil) {
         [_avPl play];
     }
-    
-        [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait animated:NO];
-
-        UINavigationController* nc = [[UINavigationController alloc] init];
-        [self.navigationController presentViewController:nc animated:NO completion:^{
-        }];
-        [self.navigationController dismissViewControllerAnimated:YES completion:^{
-        }];
-    
-    NSString *langValue = [[NSUserDefaults standardUserDefaults] stringForKey:@"LangValue"];
-    if ([langValue isEqualToString:@""] == false && langValue != nil) {
-        if ([langValue isEqualToString:@"TUR"]) {
-            [self.goButton setTitle:@"Giriş" forState:UIControlStateNormal];
-            self.selectedLanguage = @"tr";
-            [languageButton setTitle:@"TUR" forState:UIControlStateNormal];
-        } else if ([langValue isEqualToString:@"RUS"]) {
-            [self.goButton setTitle:@"Логин" forState:UIControlStateNormal];
-            self.selectedLanguage = @"ru";
-            [languageButton setTitle:@"RUS" forState:UIControlStateNormal];
-        } else if ([langValue isEqualToString:@"AZR"]) {
-            [self.goButton setTitle:@"Daxil ol" forState:UIControlStateNormal];
-            self.selectedLanguage = @"az";
-            [languageButton setTitle:@"AZR" forState:UIControlStateNormal];
-        } else {
-            [self.goButton setTitle:@"Login" forState:UIControlStateNormal];
-            self.selectedLanguage = @"en";
-            [languageButton setTitle:@"ENG" forState:UIControlStateNormal];
-        }
-    }
 }
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -193,18 +164,18 @@ BOOL isPreseller = true;
         isPreseller = false;
     }
     
-    [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"isPreseller"];
+    [[NSUserDefaults standardUserDefaults] setBool:isPreseller forKey:@"isPreseller"];
     
     [self viewDidLoad];
     [self viewWillAppear:YES];
     
     
     //MARK: will come in handy soon
-//    if([self.usernameTextField.text length] >0)
-//        [[NSUserDefaults standardUserDefaults] setValue:[self.usernameTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
-//    if([self.passwordTextField.text length] >0)
-//        [[NSUserDefaults standardUserDefaults] setValue:self.passwordTextField.text forKey:@"Password"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
+    if([self.usernameTextField.text length] >0)
+        [[NSUserDefaults standardUserDefaults] setValue:[self.usernameTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
+    if([self.passwordTextField.text length] >0)
+        [[NSUserDefaults standardUserDefaults] setValue:self.passwordTextField.text forKey:@"Password"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     
     //removes webview and displayed login page
@@ -293,97 +264,90 @@ BOOL isPreseller = true;
     return [emailTest evaluateWithObject:candidate];
 }
 
-- (void) receiveGoButtonAction:(NSNotification *) notification
-{
-    if ([[notification name] isEqualToString:@"GoButtonTapped"])
-        NSLog (@"Successfully received the test notification!");
-}
-
 -(void) actionLogin
 {
-//    if ([self validateEmail:self.usernameTextField.text]) {
-//        UIAlertController *emailAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"email_error_title", "") message:NSLocalizedString(@"email_error_message", "") preferredStyle:UIAlertControllerStyleAlert];
-//        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", "") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//            [emailAlert dismissViewControllerAnimated:YES completion:nil];
-//        }];
-//        [emailAlert addAction:okAction];
-//        [self presentViewController:emailAlert animated:YES completion:nil];
-//        return ;
-//    }
+    if ([self validateEmail:self.usernameTextField.text]) {
+        UIAlertController *emailAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"email_error_title", "") message:NSLocalizedString(@"email_error_message", "") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", "") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [emailAlert dismissViewControllerAnimated:YES completion:nil];
+        }];
+        [emailAlert addAction:okAction];
+        [self presentViewController:emailAlert animated:YES completion:nil];
+        return ;
+    }
     
     
     
-//    NSString *loginUsername = self.usernameTextField.text;
-//    NSString *presellerPrefix = @"@cci.com.tr.sf";
-//    
-//    if ([self isQA]) {
-//        presellerPrefix = @"@cci.com.tr.sf.qa1";
-//    }
-//    
-//    t = [NSTimer scheduledTimerWithTimeInterval: 180.0
-//                                         target: self
-//                                       selector:@selector(onTick:)
-//                                       userInfo: nil repeats:NO];
-//    [self.usernameTextField resignFirstResponder];
-//    [self.passwordTextField resignFirstResponder];
-//    NSString *urlAdfs=@"https://sso.cci.com.tr/adfs/ls/";
-//    NSString *idLogin=@"ContentPlaceHolder1_UsernameTextBox";
-//    NSString *idPassword=@"ContentPlaceHolder1_PasswordTextBox";
-//    NSString *idError=@"ContentPlaceHolder1_ErrorTextLabel";
-//    NSString *loginSubmitButtonHTMLString=@"document.getElementById(\"ContentPlaceHolder1_SubmitButton\").click();";
+    NSString *loginUsername = self.usernameTextField.text;
+    NSString *presellerPrefix = @"@cci.com.tr.sf";
+    
+    if ([self isQA]) {
+        presellerPrefix = @"@cci.com.tr.sf.qa1";
+    }
+    
+    t = [NSTimer scheduledTimerWithTimeInterval: 180.0
+                                         target: self
+                                       selector:@selector(onTick:)
+                                       userInfo: nil repeats:NO];
+    [self.usernameTextField resignFirstResponder];
+    [self.passwordTextField resignFirstResponder];
+    NSString *urlAdfs=@"https://sso.cci.com.tr/adfs/ls/";
+    NSString *idLogin=@"ContentPlaceHolder1_UsernameTextBox";
+    NSString *idPassword=@"ContentPlaceHolder1_PasswordTextBox";
+    NSString *idError=@"ContentPlaceHolder1_ErrorTextLabel";
+    NSString *loginSubmitButtonHTMLString=@"document.getElementById(\"ContentPlaceHolder1_SubmitButton\").click();";
     
     
-//    if (isPreseller) {
-//        idLogin = @"username";
-//        idPassword = @"password";
-//        loginSubmitButtonHTMLString = @"document.getElementById(\"Login\").click();";
-//        urlAdfs = @"https://test.salesforce.com"; //this does nothing but..
-//        idError=@"Error";
+    if (isPreseller) {
+        idLogin = @"username";
+        idPassword = @"password";
+        loginSubmitButtonHTMLString = @"document.getElementById(\"Login\").click();";
+        urlAdfs = @"https://test.salesforce.com"; //this does nothing but..
+        idError=@"Error";
         //
         //        NSString *processName = [[NSProcessInfo processInfo] processName];
         //        NSString *processID = [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]];
-//        loginUsername = [NSString stringWithFormat:@"%@%@", loginUsername, presellerPrefix];
+        loginUsername = [NSString stringWithFormat:@"%@%@", loginUsername, presellerPrefix];
         //        loginUsername = loginUsername + presellerPrefix;
-//    }
-//
-//    self.progressView.hidden = NO;
-//    UIWebView*webView=(UIWebView*)self.oauthView;
+    }
     
-//    if([self.usernameTextField.text length] >0)
-//        [[NSUserDefaults standardUserDefaults] setValue:[self.usernameTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
-//    if([self.passwordTextField.text length] >0)
-//        [[NSUserDefaults standardUserDefaults] setValue:self.passwordTextField.text forKey:@"Password"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
+    self.progressView.hidden = NO;
+    UIWebView*webView=(UIWebView*)self.oauthView;
     
-//    if(nil!=webView){
-//        [self set:idLogin
-//               to:[loginUsername stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
-//             html:webView ];
-//        [self set:idPassword
-//               to:[self.passwordTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
-//             html:webView ];
-//        NSString * output=[webView stringByEvaluatingJavaScriptFromString:loginSubmitButtonHTMLString];
-//        NSLog(@"output : %@",output);
-//    }
+    if([self.usernameTextField.text length] >0)
+        [[NSUserDefaults standardUserDefaults] setValue:[self.usernameTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
+    if([self.passwordTextField.text length] >0)
+        [[NSUserDefaults standardUserDefaults] setValue:self.passwordTextField.text forKey:@"Password"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-   
+    if(nil!=webView){
+        [self set:idLogin
+               to:[loginUsername stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
+             html:webView ];
+        [self set:idPassword
+               to:[self.passwordTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
+             html:webView ];
+        NSString * output=[webView stringByEvaluatingJavaScriptFromString:loginSubmitButtonHTMLString];
+        NSLog(@"output : %@",output);
+    }
     
-//    NSString *currentURL = webView.request.URL.absoluteString;
-//    //    NSLog(@"load finished yo: %@  --- " , currentURL);
-//
-//    if ([currentURL containsString:@"ChangePassword"] &&  [currentURL containsString:@"salesforce.com"] && [currentURL containsString:@"RemoteAccessAuthorizationPage"]) {
-//
-//        webView.hidden = false;
-//        webView.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
-//        //        [[[[[UIApplication sharedApplication] keyWindow] subviews] lastObject] addSubview:webView];
-//        //        [self.view addSubview:webView];
-//        //        [self.view bringSubviewToFront:webView];
-//        self.progressView.hidden = true;
-//
-//        [webView.scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
-//
-//
-//    }
+    
+    NSString *currentURL = webView.request.URL.absoluteString;
+    //    NSLog(@"load finished yo: %@  --- " , currentURL);
+    
+    if ([currentURL containsString:@"ChangePassword"] &&  [currentURL containsString:@"salesforce.com"] && [currentURL containsString:@"RemoteAccessAuthorizationPage"]) {
+        
+        webView.hidden = false;
+        webView.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
+        //        [[[[[UIApplication sharedApplication] keyWindow] subviews] lastObject] addSubview:webView];
+        //        [self.view addSubview:webView];
+        //        [self.view bringSubviewToFront:webView];
+        self.progressView.hidden = true;
+        
+        [webView.scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+        
+        
+    }
     ////    [self.view bringSubviewToFront:webView];
     //
     //    [self.view addSubview:webView];
@@ -410,34 +374,7 @@ BOOL isPreseller = true;
     
     self.isLoginClick = YES;
     [self actionLogin];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GoButtonTapped"
-                                                        object:nil
-                                                      userInfo:nil];
-    
-    self.progressView.hidden = NO;
-    UIWebView*webView=(UIWebView*)self.oauthView;
-    //webView.delegate = self;
-    webView.hidden = false;
-    webView.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
-    NSURL* blankURL = [NSURL URLWithString:@"about:blank"];
-    NSURLRequest* blankReq = [NSURLRequest requestWithURL:blankURL];
-    [webView loadRequest:blankReq];
-    NSURL* url = [NSURL URLWithString:@"https://cci-ice--qa1.sandbox.lightning.force.com/services/oauth2/authorize?response_type=token&client_id=3MVG954MqIw6FnnPdRJ8vKy.OE4Dxm6LeJ4gyG73gFacpbcBIPt50kDKNGgEnM0KZRr1CVkg4uXsstWCsaJGU&redirect_uri=testsfdc:///mobilesdk/detect/oauth/done&state=mystate"];
-    NSURLRequest* req = [NSURLRequest requestWithURL:url];
-    [webView loadRequest:req];
-    self.progressView.hidden = true;
-    
-    [webView.scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
-    
     //[self performSelector:@selector(subscribe) withObject:self afterDelay:30.0 ];
-}
-
-- (void)webViewDidStartLoad:(UIWebView *)webView {
-    NSString * cmd = @"document.getElementById('username').value";
-    NSString * username = [webView stringByEvaluatingJavaScriptFromString:cmd];
-    if (!username.isEmptyOrWhitespaceAndNewlines) {
-        [[NSUserDefaults standardUserDefaults] setValue:[username stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
-    }
 }
 
 - (IBAction)clickedResetPassword:(id)sender {
@@ -582,8 +519,8 @@ BOOL isPreseller = true;
     [[NSUserDefaults standardUserDefaults] setValue:text forKey:@"LangValue"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setLanguages];
-//    self.usernameTextField.placeholder = usernameLocal;
-//    self.passwordTextField.placeholder = passwordLocal;
+    self.usernameTextField.placeholder = usernameLocal;
+    self.passwordTextField.placeholder = passwordLocal;
     
     NSString *langValue =[[NSUserDefaults standardUserDefaults] stringForKey:@"LangValue"];
     //    if([langValue isEqualToString:self.langList[1]]){
@@ -597,19 +534,6 @@ BOOL isPreseller = true;
     //    [self.salesCenterButton setTitle:selectSalesCenterLocal forState:UIControlStateNormal];
     self.orLabel.text = orLocal;
     [languageButton setTitle:text forState:UIControlStateNormal];
-    if ([text isEqualToString:@"TUR"]) {
-        [self.goButton setTitle:@"Giriş" forState:UIControlStateNormal];
-        self.selectedLanguage = @"tr";
-    } else if ([text isEqualToString:@"RUS"]) {
-        [self.goButton setTitle:@"Логин" forState:UIControlStateNormal];
-        self.selectedLanguage = @"ru";
-    } else if ([text isEqualToString:@"AZR"]) {
-        [self.goButton setTitle:@"Daxil ol" forState:UIControlStateNormal];
-        self.selectedLanguage = @"az";
-    } else {
-        [self.goButton setTitle:@"Login" forState:UIControlStateNormal];
-        self.selectedLanguage = @"en";
-    }
     languageTableView.hidden = YES;
     [cityTableView reloadData];
 }
@@ -630,8 +554,8 @@ BOOL isPreseller = true;
         [[NSUserDefaults standardUserDefaults] setValue:text forKey:@"LangValue"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self setLanguages];
-//        self.usernameTextField.placeholder = usernameLocal;
-//        self.passwordTextField.placeholder = passwordLocal;
+        self.usernameTextField.placeholder = usernameLocal;
+        self.passwordTextField.placeholder = passwordLocal;
         
         NSString *langValue =[[NSUserDefaults standardUserDefaults] stringForKey:@"LangValue"];
         //        if([langValue isEqualToString:self.langList[1]]){
@@ -731,7 +655,7 @@ BOOL isPreseller = true;
         // selectCityLocal = @"TR";
         selectSalesCenterLocal = @"Select Sales Center";
         orLocal = @"OR";
-//        loginTypeLabel.text = @"Distributor Login";
+        loginTypeLabel.text = @"Distributor Login";
     }
     else if([langValue isEqualToString:self.langList[1]])
     {
@@ -740,7 +664,7 @@ BOOL isPreseller = true;
         // selectCityLocal = @"TR";
         selectSalesCenterLocal = @"Satış Noktası Seçiniz";
         orLocal = @"VEYA";
-//        loginTypeLabel.text = @"Dağıtıcı Girişi";
+        loginTypeLabel.text = @"Dağıtıcı Girişi";
         
     }
     else if([langValue isEqualToString:self.langList[2]])
@@ -750,7 +674,7 @@ BOOL isPreseller = true;
         //  selectCityLocal = @"TR";
         selectSalesCenterLocal = @"Выберите Центр продаж";
         orLocal = @"или";
-//        loginTypeLabel.text = @"Distributor Login";
+        loginTypeLabel.text = @"Distributor Login";
         
     }
     else if([langValue isEqualToString:self.langList[3]])
@@ -760,7 +684,7 @@ BOOL isPreseller = true;
         //  selectCityLocal = @"TR";
         selectSalesCenterLocal = @"Satış Noktası Seçiniz";
         orLocal = @"VEYA";
-//        loginTypeLabel.text = @"Distributor Login";
+        loginTypeLabel.text = @"Distributor Login";
         
     }
     
@@ -784,18 +708,7 @@ BOOL isPreseller = true;
         [self.langList addObject:@"TUR"];
         [self.langList addObject:@"RUS"];
         [self.langList addObject:@"AZR"];
-        self.view.backgroundColor = [UIColor.whiteColor colorWithAlphaComponent:0.9];
-        UIImageView *bottleImage = [[UIImageView alloc] initWithFrame:self.view.layer.bounds];
-        
-        bottleImage.userInteractionEnabled = YES;
-        bottleImage.image = [UIImage imageNamed:@"cci2"];
-        bottleImage.contentMode = UIViewContentModeScaleAspectFill;
-        UITapGestureRecognizer *singleFingerTap =
-          [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                  action:@selector(handleSingleTap:)];
-        [bottleImage addGestureRecognizer:singleFingerTap];
-        [self.view addSubview:bottleImage];
-        //[self.view.layer addSublayer:self.playerLayer];
+        [self.view.layer addSublayer:self.playerLayer];
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(replayMovie:)
                                                      name: AVPlayerItemDidPlayToEndTimeNotification
@@ -883,9 +796,8 @@ BOOL isPreseller = true;
             CGRect mainRect = [[UIScreen mainScreen] bounds];
             CGFloat firstY =  (mainRect.size.height/4)-110;
             mainRect = CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width - 40, [[UIScreen mainScreen] bounds].size.height);
-            languageTableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 52,  mainRect.size.width-20, 176)
+            languageTableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 132,  mainRect.size.width-20, 150)
                                                              style:UITableViewStylePlain];
-            languageTableView.layer.cornerRadius = 8;
             //  languageTableView.tag = 0;
             languageTableView.delegate = self;
             languageTableView.dataSource = self;
@@ -919,7 +831,7 @@ BOOL isPreseller = true;
             //   self.view.backgroundColor = [UIColor colorWithRed:199.0/255.0 green:0/255.0 blue:17.0/255.0 alpha:1];
             //            self.view.backgroundColor = background;
             
-            CGRect upRect = CGRectMake(mainRect.size.width/2-106, 110, 150, 85);
+            CGRect upRect = CGRectMake(mainRect.size.width/2-106, 110, 212, 120);
             UIImageView *forManagersImageView = [[UIImageView alloc] initWithFrame:upRect];
             
             forManagersImageView.image = [UIImage imageNamed:@"ccim_logo_bottle"];
@@ -927,52 +839,48 @@ BOOL isPreseller = true;
             CGRect centerRect = CGRectMake(0,mainRect.size.height-340, mainRect.size.width, 300);
             
             self.centerView = [[UIView alloc] initWithFrame:centerRect];
-            UITapGestureRecognizer *singleFingerTap =
-              [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                      action:@selector(handleSingleTap:)];
-            [self.centerView addGestureRecognizer:singleFingerTap];
-//            self.usernameTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainRect.size.width-20, 40)];
+            self.usernameTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainRect.size.width-20, 40)];
             UIView *paddingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 40, 20)];
-//            self.usernameTextField.leftViewMode =UITextFieldViewModeAlways;
-//            self.usernameTextField.leftView = paddingView;
-//            self.usernameTextField.delegate = self;
-//            self.usernameTextField.placeholder = usernameLocal;
-//            self.usernameTextField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-//            self.usernameTextField.textColor = [UIColor colorWithRed:200.0/255.0 green:160.0/255.0 blue:160.0/255.0 alpha:1];
-//            self.usernameTextField.font = [UIFont systemFontOfSize:18];
-//            self.usernameTextField.layer.cornerRadius = 8;
-//            if(usernameValue != nil)
-//                self.usernameTextField.text = usernameValue;
+            self.usernameTextField.leftViewMode =UITextFieldViewModeAlways;
+            self.usernameTextField.leftView = paddingView;
+            self.usernameTextField.delegate = self;
+            self.usernameTextField.placeholder = usernameLocal;
+            self.usernameTextField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            self.usernameTextField.textColor = [UIColor colorWithRed:200.0/255.0 green:160.0/255.0 blue:160.0/255.0 alpha:1];
+            self.usernameTextField.font = [UIFont systemFontOfSize:18];
+            self.usernameTextField.layer.cornerRadius = 8;
+            if(usernameValue != nil)
+                self.usernameTextField.text = usernameValue;
             //   self.label.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_form_username.png"]];
-//            CGRect labelRect = self.usernameTextField.bounds;
-//            UIImage *img2 = [UIImage imageNamed:@"i_username"];
-//            UIImageView *imageView2 = [[UIImageView alloc] initWithImage:img2];
-//            imageView2.frame = CGRectMake(10, 12,16,16);
-//            [self.usernameTextField addSubview:imageView2 ];
-//            self.usernameTextField.backgroundColor = [UIColor whiteColor];
-//
-//            self.passwordTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 55,  mainRect.size.width-20, 40)];
-//            self.passwordTextField.placeholder = passwordLocal;
-//            self.passwordTextField.delegate = self;
-//            self.passwordTextField.secureTextEntry = YES;
-//            self.passwordTextField.textColor = [UIColor colorWithRed:200.0/255.0 green:160.0/255.0 blue:160.0/255.0 alpha:1];
-//            self.passwordTextField.font = [UIFont systemFontOfSize:18];
-//            self.passwordTextField.layer.cornerRadius = 8;
-//            if(passValue != nil)
-//                self.passwordTextField.text = passValue;
+            CGRect labelRect = self.usernameTextField.bounds;
+            UIImage *img2 = [UIImage imageNamed:@"i_username"];
+            UIImageView *imageView2 = [[UIImageView alloc] initWithImage:img2];
+            imageView2.frame = CGRectMake(10, 12,16,16);
+            [self.usernameTextField addSubview:imageView2 ];
+            self.usernameTextField.backgroundColor = [UIColor whiteColor];
             
-//            UIImage *img3 = [UIImage imageNamed:@"i_pw"];
-//            UIImageView *imageView3 = [[UIImageView alloc] initWithImage:img3];
-//            imageView3.frame = CGRectMake(10, 12,16,16);
-//            [self.passwordTextField addSubview:imageView3 ];
-//            self.passwordTextField.backgroundColor = [UIColor whiteColor];
+            self.passwordTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 55,  mainRect.size.width-20, 40)];
+            self.passwordTextField.placeholder = passwordLocal;
+            self.passwordTextField.delegate = self;
+            self.passwordTextField.secureTextEntry = YES;
+            self.passwordTextField.textColor = [UIColor colorWithRed:200.0/255.0 green:160.0/255.0 blue:160.0/255.0 alpha:1];
+            self.passwordTextField.font = [UIFont systemFontOfSize:18];
+            self.passwordTextField.layer.cornerRadius = 8;
+            if(passValue != nil)
+                self.passwordTextField.text = passValue;
             
-//            UIView *paddingView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 40, 20)];
-//            self.passwordTextField.leftViewMode =UITextFieldViewModeAlways;
-//            self.passwordTextField.leftView = paddingView2;
+            UIImage *img3 = [UIImage imageNamed:@"i_pw"];
+            UIImageView *imageView3 = [[UIImageView alloc] initWithImage:img3];
+            imageView3.frame = CGRectMake(10, 12,16,16);
+            [self.passwordTextField addSubview:imageView3 ];
+            self.passwordTextField.backgroundColor = [UIColor whiteColor];
+            
+            UIView *paddingView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 40, 20)];
+            self.passwordTextField.leftViewMode =UITextFieldViewModeAlways;
+            self.passwordTextField.leftView = paddingView2;
             
             
-            self.languageButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 50,  mainRect.size.width-20, 40)];
+            self.languageButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 100,  mainRect.size.width-20, 40)];
             UIImage *imgLang = [UIImage imageNamed:@"i_language"];
             UIImageView *imageViewLang = [[UIImageView alloc] initWithImage:imgLang];
             imageViewLang.frame = CGRectMake(10, 12,16,16);
@@ -981,8 +889,6 @@ BOOL isPreseller = true;
             UIImage *imgRightArrow1 = [UIImage imageNamed:@"i_select_arrow_down"];
             UIImageView *imgViewRightArrow1 = [[UIImageView alloc] initWithImage:imgRightArrow1];
             imgViewRightArrow1.frame = CGRectMake(languageButton.frame.size.width-20, 15,15,10);
-            UITapGestureRecognizer *arrowGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hanfleArrowTap:)];
-            [imgViewRightArrow1 addGestureRecognizer:arrowGesture];
             [self.languageButton addSubview:imgViewRightArrow1 ];
             
             
@@ -1043,17 +949,17 @@ BOOL isPreseller = true;
             //            self.salesCenterButton.font = [UIFont systemFontOfSize:18];
             
             
-//            self.loginTypeSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(mainRect.size.width-65, 145,  mainRect.size.width-20, 40)];
-//            self.loginTypeSwitch.backgroundColor = [UIColor clearColor];
-//            self.loginTypeSwitch.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-//            [self.loginTypeSwitch addTarget:self action:@selector(switchToggled:) forControlEvents:UIControlEventValueChanged];
+            self.loginTypeSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(mainRect.size.width-65, 145,  mainRect.size.width-20, 40)];
+            self.loginTypeSwitch.backgroundColor = [UIColor clearColor];
+            self.loginTypeSwitch.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+            [self.loginTypeSwitch addTarget:self action:@selector(switchToggled:) forControlEvents:UIControlEventValueChanged];
             
             
-//            self.loginTypeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 145 ,  mainRect.size.width-20, 30)];
-//            loginTypeLabel.text = @"Distributor Login";
-//            loginTypeLabel.textColor = [UIColor whiteColor];
-//            loginTypeLabel.textAlignment = NSTextAlignmentLeft;
-//            loginTypeLabel.font = [UIFont systemFontOfSize:18];
+            self.loginTypeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 145 ,  mainRect.size.width-20, 30)];
+            loginTypeLabel.text = @"Distributor Login";
+            loginTypeLabel.textColor = [UIColor whiteColor];
+            loginTypeLabel.textAlignment = NSTextAlignmentLeft;
+            loginTypeLabel.font = [UIFont systemFontOfSize:18];
             
             
             //            self.cityButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 145,  mainRect.size.width-20, 40)];
@@ -1062,8 +968,8 @@ BOOL isPreseller = true;
             
             
             
-            self.goButton =  [[UIButton alloc] initWithFrame:CGRectMake(10,110,  mainRect.size.width-20, 40)];
-            [self.goButton setTitle:@"Login" forState:UIControlStateNormal];
+            self.goButton =  [[UIButton alloc] initWithFrame:CGRectMake(10,190,  mainRect.size.width-20, 40)];
+            [self.goButton setTitle:@"Go!" forState:UIControlStateNormal];
             self.goButton.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"btn_dark_grey"]];
             self.goButton.titleLabel.textColor = [UIColor whiteColor];
             [self.goButton addTarget:self
@@ -1182,13 +1088,13 @@ BOOL isPreseller = true;
             UIView *divider =[[UIView alloc] initWithFrame:CGRectMake(10, 55, mainRect.size.width-20, 1)];
             divider.backgroundColor = [UIColor colorWithRed:207.0/255.0 green:207.0/255.0 blue:207.0/255.0 alpha:1];
             
-//            self.usernameTextField.tag = 0;
-//            self.passwordTextField.tag = 1;
-//            [self.centerView addSubview:self.usernameTextField];
-//            [self.centerView addSubview:self.passwordTextField];
+            self.usernameTextField.tag = 0;
+            self.passwordTextField.tag = 1;
+            [self.centerView addSubview:self.usernameTextField];
+            [self.centerView addSubview:self.passwordTextField];
             [self.centerView addSubview:self.languageButton];
-//            [self.centerView addSubview:self.loginTypeSwitch];
-//            [self.centerView addSubview:self.loginTypeLabel];
+            [self.centerView addSubview:self.loginTypeSwitch];
+            [self.centerView addSubview:self.loginTypeLabel];
             
             //            [self.centerView addSubview:self.cityButton];
             //    [self.centerView addSubview:self.salesCenterButton];
@@ -1228,7 +1134,7 @@ BOOL isPreseller = true;
         }
         
         if (isPreseller) {
-//            [loginTypeSwitch setOn:YES animated:YES];
+            [loginTypeSwitch setOn:YES animated:YES];
         }
     }
     
@@ -1295,20 +1201,6 @@ BOOL isPreseller = true;
     self.view.backgroundColor = [UIColor grayColor];
 }
 
-- (void)handleSingleTap:(UITapGestureRecognizer *)recognizer
-{
-    self.languageTableView.hidden = YES;
-}
-
-- (void)hanfleArrowTap:(UITapGestureRecognizer *)recognizer
-{
-    if (self.languageTableView.isHidden) {
-        self.languageTableView.hidden = NO;
-    } else {
-        self.languageTableView.hidden = YES;
-    }
-}
-
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
@@ -1341,15 +1233,15 @@ BOOL isPreseller = true;
 -(void) onButtonClickListener:(id) sender {
     
     
-//    [t invalidate];
-//    UIWebView * webView = (UIWebView*)self.oauthView;
-//
-//    if (webView != nil) {
-//        [webView stopLoading];
-//        self.isLoginClick = NO;
-//    }
-//
-//    self.progressView.hidden = YES;
+    [t invalidate];
+    UIWebView * webView = (UIWebView*)self.oauthView;
+    
+    if (webView != nil) {
+        [webView stopLoading];
+        self.isLoginClick = NO;
+    }
+    
+    self.progressView.hidden = YES;
     
 }
 
