@@ -915,11 +915,12 @@ static Class InstanceClass = nil;
         self.statusAlert = nil;
     }
     [self log:SFLogLevelError format:@"Error during authentication: %@", error];
-    [self showAlertWithTitle:[SFSDKResourceUtils localizedString:kAlertErrorTitleKey]
-                     message:[NSString stringWithFormat:[SFSDKResourceUtils localizedString:kAlertConnectionErrorFormatStringKey], [error localizedDescription]]
-            firstButtonTitle:[SFSDKResourceUtils localizedString:kAlertRetryButtonKey]
-            secondButtonTitle:[SFSDKResourceUtils localizedString:kAlertDismissButtonKey]
-                         tag:tag];
+    [self ShowToast:@"Network not available"];
+//    [self showAlertWithTitle:[SFSDKResourceUtils localizedString:kAlertErrorTitleKey]
+//                     message:[NSString stringWithFormat:[SFSDKResourceUtils localizedString:kAlertConnectionErrorFormatStringKey], [error localizedDescription]]
+//            firstButtonTitle:[SFSDKResourceUtils localizedString:kAlertRetryButtonKey]
+//            secondButtonTitle:[SFSDKResourceUtils localizedString:kAlertDismissButtonKey]
+//                         tag:tag];
 }
 
 - (void)showAlertForConnectedAppVersionMismatchError
@@ -929,6 +930,26 @@ static Class InstanceClass = nil;
             firstButtonTitle:[SFSDKResourceUtils localizedString:kAlertOkButtonKey]
             secondButtonTitle:[SFSDKResourceUtils localizedString:kAlertDismissButtonKey]
                          tag:kConnectedAppVersionMismatchViewTag];
+}
+
+- (void) ShowToast:(NSString *)Message {
+    UIAlertController * alert=[UIAlertController alertControllerWithTitle:nil
+                                                                  message:@""
+                                                           preferredStyle:UIAlertControllerStyleAlert];
+    UIView *firstSubview = alert.view.subviews.firstObject;
+    UIView *alertContentView = firstSubview.subviews.firstObject;
+    for (UIView *subSubView in alertContentView.subviews) {
+        subSubView.backgroundColor = [UIColor colorWithRed:44/255.0f green:47/255.0f blue:46/255.0f alpha:0.8f];
+    }
+    NSMutableAttributedString *AS = [[NSMutableAttributedString alloc] initWithString:Message];
+    [AS addAttribute: NSForegroundColorAttributeName value: [UIColor whiteColor] range: NSMakeRange(0,AS.length)];
+    [alert setValue:AS forKey:@"attributedTitle"];
+    [[SFRootViewManager sharedManager] pushViewController:alert];
+    //[self presentViewController:alert animated:YES completion:nil];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [alert dismissViewControllerAnimated:YES completion:^{
+        }];
+    });
 }
 
 - (void)showAlertWithTitle:(nullable NSString *)title message:(nullable NSString *)message firstButtonTitle:(nullable NSString *)firstButtonTitle secondButtonTitle:(nullable NSString *)secondButtonTitle tag:(NSInteger)tag

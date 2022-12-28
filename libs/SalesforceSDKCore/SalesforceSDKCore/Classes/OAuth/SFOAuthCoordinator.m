@@ -150,6 +150,8 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
         self.authenticating = NO;
         _timeout = kSFOAuthDefaultTimeout;
         _view = nil;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     
     // response data is initialized in didReceiveResponse
@@ -901,6 +903,12 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
 #pragma mark - UIWebViewDelegate (User-Agent Token Flow)
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    webView.scrollView.delegate = self;
+    
+    NSString * cmd_azureUserName =@"document.querySelector(\"input[type='email']\").value";
+    self.username_azure = [webView stringByEvaluatingJavaScriptFromString:cmd_azureUserName];
+    NSString * cmd_pass_azurePass = @"document.querySelector(\"input[type='password']\").value";
+    self.password_azurePass = [webView stringByEvaluatingJavaScriptFromString:cmd_pass_azurePass];
     
     if (self.credentials.logLevel < kSFOAuthLogLevelWarning) {
         [self log:SFLogLevelDebug format:@"%@ (navType=%ld): host=%@ : path=%@",
@@ -921,6 +929,15 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     NSURL *url = webView.request.URL;
     
+    NSString * cmd = @"document.getElementById('username').value";
+    NSString * cmd_azureUserName = @"document.querySelector(\"input[type='email']\").value";
+    self.username = [webView stringByEvaluatingJavaScriptFromString:cmd];
+    self.username_azure = [webView stringByEvaluatingJavaScriptFromString:cmd_azureUserName];
+    NSString * cmd_pass = @"document.getElementById('password').value";
+    NSString * cmd_pass_azurePass = @"document.querySelector(\"input[type='password']\").value";
+    self.password = [webView stringByEvaluatingJavaScriptFromString:cmd_pass];
+    self.password_azurePass = [webView stringByEvaluatingJavaScriptFromString:cmd_pass_azurePass];
+    
     if (self.credentials.logLevel < kSFOAuthLogLevelWarning) {
         [self log:SFLogLevelDebug format:@"%@ host=%@ : path=%@", NSStringFromSelector(_cmd), url.host, url.path];
     }
@@ -930,7 +947,78 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
     }
 }
 
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    return nil;
+}
+
+-(void)keyboardWillShow:(NSNotification*)aNotification{
+    NSString * cmd_azureUserName =@"document.querySelector(\"input[type='email']\").value";
+    self.username_azure = [self.view stringByEvaluatingJavaScriptFromString:cmd_azureUserName];
+    NSString * cmd_pass_azurePass = @"document.querySelector(\"input[type='password']\").value";
+    self.password_azurePass = [self.view stringByEvaluatingJavaScriptFromString:cmd_pass_azurePass];
+    NSDictionary* info = [aNotification userInfo];
+    float kbHeight = [[NSNumber numberWithFloat:[[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size.height]floatValue];
+    float kbWidth = [[NSNumber numberWithFloat:[[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size.width]floatValue];
+    //Check orientation and scroll down webview content by keyboard size
+    NSString *url = self.view.request.mainDocumentURL.absoluteString;
+    if(kbWidth==[UIScreen mainScreen].bounds.size.width){
+        if ([url containsString:@"microsoft"] == true) {
+            [[self.view scrollView] setContentOffset:CGPointMake(0, -kbHeight + 60) animated:YES];
+        } else {
+            [[self.view scrollView] setContentOffset:CGPointMake(0, -kbHeight + 80) animated:YES];
+        }
+    }else if (kbHeight==[UIScreen mainScreen].bounds.size.height){
+        self.view.scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+    }
+}
+
+-(void)keyboardWillHide:(NSNotification*)aNotification{
+    NSString * cmd_azureUserName =@"document.querySelector(\"input[type='email']\").value";
+    self.username_azure = [self.view stringByEvaluatingJavaScriptFromString:cmd_azureUserName];
+    NSString * cmd_pass_azurePass = @"document.querySelector(\"input[type='password']\").value";
+    self.password_azurePass = [self.view stringByEvaluatingJavaScriptFromString:cmd_pass_azurePass];
+}
+
+- (void)setUserName:(NSString *)username {
+    if ([username isEqualToString: @""] == false) {
+        [[NSUserDefaults standardUserDefaults] setValue:[username stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
+-(void)setUserNameAzure:(NSString *)username_azure {
+    if ([username_azure isEqualToString: @""] == false) {
+        [[NSUserDefaults standardUserDefaults] setValue:[username_azure stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Username"];
+        [[NSUserDefaults standardUserDefaults] setValue:@"true" forKey:@"AzureLogin"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
+- (void)setPassword:(NSString *)password {
+    if ([password isEqualToString: @""] == false) {
+        [[NSUserDefaults standardUserDefaults] setValue:[password stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Password"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
+- (void)setPasswordAzure:(NSString *)password_azurePass {
+    if ([password_azurePass isEqualToString: @""] == false) {
+        [[NSUserDefaults standardUserDefaults] setValue:[password_azurePass stringByReplacingOccurrencesOfString:@" " withString:@""] forKey:@"Password"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
+    if ([webView.request.mainDocumentURL.absoluteString containsString:@"microsoft"]) {
+        NSString *zoomCmd = [NSString stringWithFormat:@"document.body.style.zoom = 0.85;"];
+        [webView stringByEvaluatingJavaScriptFromString:zoomCmd];
+    }
+    
+    NSString * cmd_azureUserName = @"document.querySelector(\"input[type='email']\").value";
+    self.username_azure = [webView stringByEvaluatingJavaScriptFromString:cmd_azureUserName];
+    NSString * cmd_pass_azurePass = @"document.querySelector(\"input[type='password']\").value";
+    self.password_azurePass = [webView stringByEvaluatingJavaScriptFromString:cmd_pass_azurePass];
+    
     NSString *htmlContent = [webView stringByEvaluatingJavaScriptFromString:
                              @"document.body.innerHTML"];
     if ([htmlContent containsString:@"Server Error"]) {
@@ -969,9 +1057,9 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
         [self.delegate oauthCoordinator:self didBeginAuthenticationWithView:self.view];
         NSAssert((nil != [self.view superview]), @"No superview for oauth web view after didBeginAuthenticationWithView");
     }
-    if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"])
-        [self simuateUserActions:webView];
-    
+//    if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"])
+//        [self simuateUserActions:webView];
+//    
 //    NSString *currentURL = [webView stringByEvaluatingJavaScriptFromString:@"window.location.href"];
 //    NSString *anotherURL = webView.request.URL.absoluteString;
 //    NSLog(@"load finished yo: %@  --- " , anotherURL);
@@ -980,13 +1068,13 @@ static NSString * const kOAuthUserAgentUserDefaultsKey          = @"UserAgent";
 //        
 //        webView.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
 //        
-////        UIViewController *topVC = [[[[UIApplication sharedApplication] keyWindow] subviews] lastObject];
+//        UIViewController *topVC = [[[[UIApplication sharedApplication] keyWindow] subviews] lastObject];
 //
-////        WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
-////        WKWebView *webViewSF = [[WKWebView alloc] initWithFrame:self.view.frame configuration:theConfiguration];
-////        NSURL *nsurl=[NSURL URLWithString: anotherURL];
-////        NSURLRequest *nsrequest=[NSURLRequest requestWithURL:nsurl];
-////        [webViewSF loadRequest:nsrequest];
+//        WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
+//        WKWebView *webViewSF = [[WKWebView alloc] initWithFrame:self.view.frame configuration:theConfiguration];
+//        NSURL *nsurl=[NSURL URLWithString: anotherURL];
+//        NSURLRequest *nsrequest=[NSURLRequest requestWithURL:nsurl];
+//        [webViewSF loadRequest:nsrequest];
 //        [self.view addSubview:webView];
 //        [[[[[UIApplication sharedApplication] keyWindow] subviews] lastObject] addSubview:webView];
 //        

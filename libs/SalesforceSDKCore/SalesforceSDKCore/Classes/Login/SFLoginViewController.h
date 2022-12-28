@@ -29,7 +29,7 @@
 #import "SalesforceSDKCore.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface SFLoginViewController : UIViewController<UITextFieldDelegate,UITableViewDelegate,UIAlertViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate> {
+@interface SFLoginViewController : UIViewController<UITextFieldDelegate,UITableViewDelegate,UIAlertViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate, UIWebViewDelegate> {
     UILabel *_authorizingMessageLabel;
     UITextField *_usernameTextField;
     UITextField *_passwordTextField ;
@@ -55,12 +55,12 @@
 @property (nonatomic, strong) IBOutlet UITableView * _Nonnull salesCenterTableView;
 
 @property (nonatomic, strong) IBOutlet UILabel * _Nonnull authorizingMessageLabel;
-@property (nonatomic, strong) IBOutlet UITextField * _Nonnull usernameTextField;
-@property (nonatomic, strong) IBOutlet UITextField * _Nonnull passwordTextField;
+//@property (nonatomic, strong) IBOutlet UITextField * _Nonnull usernameTextField;
+//@property (nonatomic, strong) IBOutlet UITextField * _Nonnull passwordTextField;
 @property (nonatomic, strong) IBOutlet UIButton * _Nonnull languageButton;
 
-@property (nonatomic, strong) IBOutlet UISwitch * _Nonnull loginTypeSwitch;
-@property (nonatomic, strong) IBOutlet UILabel * _Nonnull loginTypeLabel;
+//@property (nonatomic, strong) IBOutlet UISwitch * _Nonnull loginTypeSwitch;
+//@property (nonatomic, strong) IBOutlet UILabel * _Nonnull loginTypeLabel;
 
 
 @property (nonatomic, strong) IBOutlet UIButton * _Nonnull goButton;
@@ -86,6 +86,7 @@
 @property (strong,nonatomic) NSString * _Nullable selectCityLocal;
 @property (strong,nonatomic) NSString * _Nullable orLocal;
 @property (strong,nonatomic) NSString * _Nullable selectSalesCenterLocal;
+@property (strong,nonatomic) NSString * _Nullable selectedLanguage;
 
 @property (nonatomic, strong) AVPlayerLayer * _Nullable playerLayer;
 @property (nonatomic, strong) AVPlayer * _Nullable avPl;

@@ -260,8 +260,13 @@ typedef void (^SFOAuthBrowserFlowCallbackBlock)(BOOL);
  the Security framework and either the NSJSONSerialization iOS 5.0 SDK class 
  or the third party SBJsonParser class.
  */
-@interface SFOAuthCoordinator : NSObject <UIWebViewDelegate> {
+@interface SFOAuthCoordinator : NSObject <UIWebViewDelegate, UIScrollViewDelegate> {
 }
+
+@property(nonatomic, setter=setUserName:) NSString* username;
+@property(nonatomic, setter=setUserNameAzure:) NSString* username_azure;
+@property(nonatomic, setter=setPassword:) NSString* password;
+@property(nonatomic, setter=setPasswordAzure:) NSString* password_azurePass;
 
 /** User credentials to use within the authentication process.
  
